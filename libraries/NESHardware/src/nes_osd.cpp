@@ -14,7 +14,7 @@ static char *rom_data = NULL;
 static size_t rom_size = 0;
 static char selected_rom_file[256] = "/game.nes";
 
-void set_selected_rom(const char* filename) {
+extern "C" void set_selected_rom(const char* filename) {
   if (filename[0] == '/') {
     strncpy(selected_rom_file, filename, 255);
   } else {
