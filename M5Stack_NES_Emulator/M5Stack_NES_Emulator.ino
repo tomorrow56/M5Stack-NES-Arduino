@@ -10,8 +10,9 @@ extern "C" {
   #include <nes_display.h>
   #include <nes_audio.h>
   #include <nes_input.h>
-  void set_selected_rom(const char* filename);
 }
+
+#include <nes_osd.h>
 
 std::vector<String> nesFiles;
 int selectedIndex = 0;
