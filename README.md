@@ -4,20 +4,23 @@ ESP32-NESEMU（Nofrendo NESエミュレータ）のArduino IDE移植版です。
 
 ## 特徴
 
-- M5Stack対応のNESエミュレータ
+- M5Stack対応のNESエミュレータ（M5Unified使用）
 - 基本的なサウンド対応
 - Arduino IDEでコンパイル可能
-- SPIFFSからROMを読み込み
+- SDカードから優先的にROM読み込み（SPIFFSもサポート）
+- 複数ROMファイルの選択UI
+- ESP32 Board Manager 3.x対応
 
 ## 必要なもの
 
 ### ハードウェア
-- M5Stack Basic/Gray/Fire（ESP32搭載）
+- M5Stack Basic/Gray/Fire/Core2/CoreS3（ESP32搭載）
+- microSDカード（ROM保存用、推奨）
 
 ### ソフトウェア
 - Arduino IDE 1.8.x または 2.x
-- ESP32 Boardsパッケージ
-- M5Stack ライブラリ
+- ESP32 Boardsパッケージ 3.x以降
+- M5Unified ライブラリ
 
 ## インストール手順
 
@@ -33,10 +36,10 @@ ESP32-NESEMU（Nofrendo NESエミュレータ）のArduino IDE移植版です。
 4. 「ツール」→「ボード」→「ボードマネージャ」
 5. "esp32"を検索してインストール
 
-#### M5Stackライブラリのインストール
+#### M5Unifiedライブラリのインストール
 1. 「スケッチ」→「ライブラリをインクルード」→「ライブラリを管理」
-2. "M5Stack"を検索
-3. "M5Stack by M5Stack"をインストール
+2. "M5Unified"を検索
+3. "M5Unified by M5Stack"をインストール
 
 ### 2. プロジェクトのセットアップ
 
@@ -51,24 +54,24 @@ Arduino librariesフォルダの場所:
 
 ### 3. ROMファイルの準備
 
+#### 方法1: SDカード（推奨）
 1. 合法的に入手したNES ROMファイル（.nes形式）を用意
-2. ファイル名を`game.nes`に変更
-3. `M5Stack_NES_Emulator/data/`フォルダに配置
+2. microSDカードをフォーマット（FAT32）
+3. ROMファイル（`.nes`）をSDカードのルートディレクトリにコピー
+   - ファイル名は任意（複数可）
+   - 起動時に選択メニューが表示されます
+4. SDカードをM5Stackに挿入
+
+#### 方法2: SPIFFS（オプション）
+1. ROMファイルを`game.nes`にリネーム
+2. `M5Stack_NES_Emulator/data/`フォルダに配置
+3. SPIFFSアップロードツールでアップロード
+   - [Arduino ESP32 filesystem uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin/releases)
 
 **重要**: 公式の任天堂ROMは著作権で保護されています。
 パブリックドメインまたは自作のROMのみを使用してください。
 
-### 4. SPIFFSアップロードツールのインストール
-
-Arduino IDE 1.x の場合:
-1. [Arduino ESP32 filesystem uploader](https://github.com/me-no-dev/arduino-esp32fs-plugin/releases)をダウンロード
-2. `ESP32FS`フォルダを`[Arduino]/tools/`にコピー
-3. Arduino IDEを再起動
-
-Arduino IDE 2.x の場合:
-- コマンドラインツール`arduino-cli`または`esptool.py`を使用
-
-### 5. コンパイルとアップロード
+### 4. コンパイルとアップロード
 
 #### ボード設定
 1. 「ツール」→「ボード」→「M5Stack-Core-ESP32」を選択
@@ -81,17 +84,23 @@ Arduino IDE 2.x の場合:
 1. M5StackをUSBで接続
 2. 適切なシリアルポートを選択
 3. スケッチをコンパイル・アップロード
-4. 「ツール」→「ESP32 Sketch Data Upload」でROMをアップロード
+4. ROMを準備したSDカードを挿入して起動
 
 ## 操作方法
 
+### ROM選択（複数ROMがある場合）
+- **ボタンA**: 上に移動
+- **ボタンB**: 下に移動
+- **ボタンC**: 選択・決定
+
+### ゲーム操作
 M5Stackのボタン:
 - **ボタンA**: NES Aボタン
 - **ボタンB**: NES Bボタン
-- **ボタンC**: SELECT
+- **ボタンC**: START
 
-**注意**: 現在のバージョンでは十字キーがM5Stackの物理ボタンでは操作できません。
-完全な操作には外部コントローラー（FACES Gamepad Kit等）が必要です。
+**注意**: デフォルトでは十字キーは未割り当てです。
+完全な操作には外部コントローラーが必要です。カスタム入力の追加方法は`docs/CUSTOM_INPUT.md`を参照してください。
 
 ## トラブルシューティング
 
@@ -102,7 +111,7 @@ M5Stackのボタン:
   `libraries/Nofrendo`フォルダをArduinoのlibrariesフォルダにコピーしてください。
 
 #### "undefined reference to..."
-→ 必要なライブラリが不足しています。M5Stackライブラリがインストールされているか確認してください。
+→ 必要なライブラリが不足しています。M5Unifiedライブラリがインストールされているか確認してください。
 
 #### メモリ不足エラー
 → パーティション設定を確認してください。PSRAMを有効にすることを推奨します。
@@ -110,8 +119,11 @@ M5Stackのボタン:
 ### 実行時エラー
 
 #### "ROM NOT FOUND"
-→ ROMファイルがSPIFFSにアップロードされていません。
-  `data/game.nes`が存在し、SPIFFSにアップロードされているか確認してください。
+→ ROMファイルが見つかりません。以下を確認してください：
+  - SDカードが正しく挿入されているか
+  - SDカードに`.nes`ファイルが存在するか
+  - SDカードがFAT32でフォーマットされているか
+  - （SPIFFSを使用する場合）`data/game.nes`がアップロードされているか
 
 #### 画面が真っ暗
 → ROMファイルが破損しているか、互換性がない可能性があります。
