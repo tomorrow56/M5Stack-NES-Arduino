@@ -1,0 +1,63 @@
+# Arduino
+*.hex
+*.elf
+*.eep
+*.lss
+*.map
+*.sym
+
+# Build artifacts
+build/
+*.o
+*.a
+*.so
+
+# Arduino IDE
+.DS_Store
+*.swp
+*.swo
+*~
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Temporary files
+*.tmp
+*.bak
+*.old
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# ROM files (do not commit copyrighted ROMs)
+*.nes
+*.NES
+data/*.nes
+M5Stack_NES_Emulator/data/*.nes
+
+# Compiled libraries (users should install these themselves)
+# Note: Project-specific libraries in /libraries/ are tracked
+
+# Log files
+*.log
+
+# Documentation build artifacts
+docs/_build/
+docs/.doctrees/
